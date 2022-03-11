@@ -188,7 +188,7 @@ def main():
                     'epoch': epoch,
                     'optimizer': optimizer.state_dict(),
                 }
-                torch.save(ddp_model.state_dict(), model_filepath)
+                torch.save(states, model_filepath)
                 print("-" * 75)
                 print("Epoch: {}, Accuracy: {}".format(epoch, accuracy))
                 print("-" * 75)
