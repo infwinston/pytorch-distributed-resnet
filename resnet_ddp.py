@@ -164,7 +164,7 @@ def main():
     start_epoch = 0
     # We only save the model who uses device "cuda:0"
     # To resume, the device for the saved model would also be "cuda:0"
-    if resume == True:
+    if resume == True and os.path.exists(model_filepath):
         map_location = {"cuda:0": "cuda:{}".format(local_rank)}
         states = torch.load(model_filepath, map_location=map_location)
         start_epoch = states['epoch']
