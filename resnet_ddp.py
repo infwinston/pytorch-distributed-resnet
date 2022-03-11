@@ -121,12 +121,6 @@ def main():
     ddp_model = torch.nn.parallel.DistributedDataParallel(
         model, device_ids=[local_rank], output_device=local_rank)
 
-    # We only save the model who uses device "cuda:0"
-    # To resume, the device for the saved model would also be "cuda:0"
-    if resume == True:
-        map_location = {"cuda:0": "cuda:{}".format(local_rank)}
-        ddp_model.load_state_dict(
-            torch.load(model_filepath, map_location=map_location))
 
     # Prepare dataset and dataloader
     transform = transforms.Compose([
@@ -167,8 +161,18 @@ def main():
                           momentum=0.9,
                           weight_decay=1e-5)
 
+    start_epoch = 0
+    # We only save the model who uses device "cuda:0"
+    # To resume, the device for the saved model would also be "cuda:0"
+    if resume == True:
+        map_location = {"cuda:0": "cuda:{}".format(local_rank)}
+        states = torch.load(model_filepath, map_location=map_location)
+        start_epoch = states['epoch']
+        optimizer.load_state_dict(states['optimizer'])
+        ddp_model.load_state_dict(states['model'])
+
     # Loop over the dataset multiple times
-    for epoch in range(num_epochs):
+    for epoch in range(start_epoch, num_epochs):
 
         print("Local Rank: {}, Epoch: {}, Training ...".format(
             local_rank, epoch))
@@ -179,6 +183,11 @@ def main():
                 accuracy = evaluate(model=ddp_model,
                                     device=device,
                                     test_loader=test_loader)
+                states = {
+                    'model': ddp_model.state_dict(),
+                    'epoch': epoch,
+                    'optimizer': optimizer.state_dict(),
+                }
                 torch.save(ddp_model.state_dict(), model_filepath)
                 print("-" * 75)
                 print("Epoch: {}, Accuracy: {}".format(epoch, accuracy))
