@@ -14,7 +14,7 @@ import numpy as np
 
 import wandb
 wandb.login()
-wandb.init(project="resnet_ddp", id="test", resume=True, dir="/checkpoints/wandb")
+wandb.init(project="resnet_ddp", id="test2", resume=True, dir="/checkpoints/wandb")
 
 
 def set_random_seeds(random_seed=0):
