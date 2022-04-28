@@ -12,6 +12,10 @@ import os
 import random
 import numpy as np
 
+import wandb
+wandb.login()
+wandb.init(project="resnet_ddp", id="test", resume=True, dir="/checkpoints/wandb")
+
 
 def set_random_seeds(random_seed=0):
 
@@ -192,6 +196,8 @@ def main():
                 print("-" * 75)
                 print("Epoch: {}, Accuracy: {}".format(epoch, accuracy))
                 print("-" * 75)
+
+                wandb.log({'epoch': epoch, 'accuracy': accuracy})
 
         ddp_model.train()
 
