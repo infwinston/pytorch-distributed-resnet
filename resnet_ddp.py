@@ -12,10 +12,8 @@ import os
 import random
 import numpy as np
 
-import wandb
-wandb.login()
-wandb.init(project="resnet_ddp", id="test3", resume=True, dir="/checkpoints/wandb")
 
+import wandb
 
 def set_random_seeds(random_seed=0):
 
@@ -90,7 +88,16 @@ def main():
     parser.add_argument("--resume",
                         action="store_true",
                         help="Resume training from saved checkpoint.")
+    parser.add_argument("--run_id",
+                        type=str,
+                        help="W&B run id.",
+                        default="test")
+
     argv = parser.parse_args()
+
+    wandb.login()
+    wandb.init(project="resnet_ddp", id=argv.run_id, resume=True, dir="/checkpoints/wandb")
+
 
     local_rank = argv.local_rank
     num_epochs = argv.num_epochs
