@@ -92,6 +92,10 @@ def main():
                         type=str,
                         help="W&B run id.",
                         default="test")
+    parser.add_argument("--wandb_dir",
+                        type=str,
+                        help="Directory for saving W&B logs.",
+                        default=None)
 
     argv = parser.parse_args()
 
@@ -108,7 +112,7 @@ def main():
 
     if local_rank == 0:
         wandb.login()
-        wandb.init(project="resnet_ddp", id=argv.run_id, resume=True, dir="/checkpoints/")
+        wandb.init(project="resnet_ddp", id=argv.run_id, resume=True, dir=argv.wandb_dir)
 
     # Create directories outside the PyTorch program
     # Do not create directory here because it is not multiprocess safe
