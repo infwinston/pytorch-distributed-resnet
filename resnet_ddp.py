@@ -108,7 +108,7 @@ def main():
 
     if local_rank == 0:
         wandb.login()
-        wandb.init(project="resnet_ddp", id=argv.run_id, resume=True, dir="/checkpoints/wandb")
+        wandb.init(project="resnet_ddp", id=argv.run_id, resume=True, dir="/checkpoints/")
 
     # Create directories outside the PyTorch program
     # Do not create directory here because it is not multiprocess safe
@@ -187,11 +187,10 @@ def main():
     # Loop over the dataset multiple times
     for epoch in range(start_epoch, num_epochs):
 
-        print("Local Rank: {}, Epoch: {}, Training ...".format(
-            local_rank, epoch))
-
         # Save and evaluate model routinely
         if epoch % 10 == 0:
+            print("Local Rank: {}, Epoch: {}, Training ...".format(
+            local_rank, epoch))
             if local_rank == 0:
                 accuracy = evaluate(model=ddp_model,
                                     device=device,
