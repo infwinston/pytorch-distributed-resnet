@@ -95,8 +95,6 @@ def main():
 
     argv = parser.parse_args()
 
-    wandb.login()
-    wandb.init(project="resnet_ddp", id=argv.run_id, resume=True, dir="/checkpoints/wandb")
 
 
     local_rank = argv.local_rank
@@ -107,6 +105,10 @@ def main():
     model_dir = argv.model_dir
     model_filename = argv.model_filename
     resume = argv.resume
+
+    if local_rank == 0:
+        wandb.login()
+        wandb.init(project="resnet_ddp", id=argv.run_id, resume=True, dir="/checkpoints/wandb")
 
     # Create directories outside the PyTorch program
     # Do not create directory here because it is not multiprocess safe
