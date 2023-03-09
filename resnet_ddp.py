@@ -101,7 +101,7 @@ def main():
 
 
 
-    local_rank = argv.local_rank
+    local_rank = int(os.environ["LOCAL_RANK"])
     num_epochs = argv.num_epochs
     batch_size = argv.batch_size
     learning_rate = argv.learning_rate
@@ -110,7 +110,8 @@ def main():
     model_filename = argv.model_filename
     resume = argv.resume
 
-    if local_rank == 0:
+    world_rank = int(os.environ["RANK"])
+    if world_rank == 0:
         wandb.login()
         wandb.init(project="resnet_ddp", id=argv.run_id, resume=True, dir=argv.wandb_dir)
 
@@ -192,10 +193,10 @@ def main():
     for epoch in range(start_epoch, num_epochs):
 
         # Save and evaluate model routinely
-        if epoch % 10 == 0:
+        if epoch % 1 == 0:
             print("Local Rank: {}, Epoch: {}, Training ...".format(
             local_rank, epoch))
-            if local_rank == 0:
+            if world_rank == 0:
                 accuracy = evaluate(model=ddp_model,
                                     device=device,
                                     test_loader=test_loader)
